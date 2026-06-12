@@ -1,0 +1,272 @@
+<div class="admin-screen">
+
+  <div class="admin-top">
+    <button class="btn btn-ghost btn-sm" (click)="router.navigate(['/profile'])">‹ Perfil</button>
+    <h2 class="section-title" style="margin:0">Panel Admin</h2>
+    <div class="live-badge"><span class="live-dot"></span>EN VIVO</div>
+  </div>
+
+  <div class="admin-tabs">
+    <div class="admin-tab" [class.active]="activeTab()==='dashboard'" (click)="setTab('dashboard')">📊 Dashboard</div>
+    <div class="admin-tab" [class.active]="activeTab()==='pedidos'"   (click)="setTab('pedidos')">📋 Pedidos <span class="tab-count">{{ orders.length }}</span></div>
+    <div class="admin-tab" [class.active]="activeTab()==='menu'"      (click)="setTab('menu')">🍕 Menú</div>
+    <div class="admin-tab" [class.active]="activeTab()==='usuarios'"  (click)="setTab('usuarios')">👥 Usuarios</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  @if (activeTab() === 'dashboard') {
+    <div class="metrics-row">
+      <div class="metric hi">
+        <div class="metric-icon">📦</div>
+        <div class="metric-val orange">{{ todayOrders }}</div>
+        <div class="metric-label">Pedidos hoy</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon">💰</div>
+        <div class="metric-val" style="font-size:20px">${{ totalSales.toLocaleString() }}</div>
+        <div class="metric-label">Ventas totales</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon">⏳</div>
+        <div class="metric-val">{{ pendingCount }}</div>
+        <div class="metric-label">Pendientes</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon">🛵</div>
+        <div class="metric-val">{{ onWayCount }}</div>
+        <div class="metric-label">En camino</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:1rem;margin-bottom:.85rem">
+      <p class="section-label">Ventas esta semana</p>
+      <div class="chart-bars">
+        @for (d of weekData; track d.label) {
+          <div class="bar-wrap">
+            <div class="bar-tooltip">${{ d.total }}</div>
+            <div class="bar" [class.peak]="d.peak" [style.height.%]="d.pct"></div>
+            <span class="bar-label">{{ d.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="card" style="padding:1rem">
+      <p class="section-label">Pedidos recientes</p>
+      @for (o of orders.slice(0,5); track o.id) {
+        <div class="dash-order-row">
+          <div>
+            <div style="font-size:13px;font-weight:700">#{{ o.id }} · {{ o.userName }}</div>
+            <div style="font-size:11px;color:var(--text2)">{{ itemsStr(o).substring(0,50) }}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="price">${{ o.total }}</div>
+            <span [class]="'badge ' + statusBadge[o.status]" style="font-size:9px">{{ statusLabels[o.status] }}</span>
+          </div>
+        </div>
+      }
+      @empty { <p style="color:var(--text2);font-size:13px;padding:.5rem 0">Sin pedidos todavía</p> }
+    </div>
+  }
+
+  <!-- PEDIDOS -->
+  @if (activeTab() === 'pedidos') {
+    <div class="data-list">
+      @for (o of orders; track o.id) {
+        <div class="dl-item">
+          <div class="dl-row">
+            <span class="dl-id">#{{ o.id }} · {{ orderDate(o) }}</span>
+            <span class="dl-total">${{ o.total }}</span>
+          </div>
+          <div class="dl-row">
+            <span class="dl-name">{{ o.userName }}</span>
+            <span [class]="'badge ' + statusBadge[o.status]">{{ statusLabels[o.status] }}</span>
+          </div>
+          <div class="dl-products">{{ itemsStr(o) }}</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:7px">📍 {{ o.address }}</div>
+          <div class="dl-actions">
+            <select class="status-select" [value]="o.status" (change)="updateStatus(o.id, $any($event.target).value)">
+              @for (s of statusFlow; track s) {
+                <option [value]="s">{{ statusLabels[s] }}</option>
+              }
+            </select>
+            @if (canAdvance(o)) {
+              <button class="btn btn-success btn-sm" (click)="advance(o.id)">→ Avanzar</button>
+            }
+          </div>
+        </div>
+      }
+      @empty {
+        <div style="text-align:center;padding:2.5rem;color:var(--text2)">
+          <div style="font-size:48px;margin-bottom:.75rem">📋</div>
+          <p>Sin pedidos todavía</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- MENU -->
+  @if (activeTab() === 'menu') {
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.85rem">
+      <button class="btn btn-primary btn-sm" (click)="openNew()">+ Nuevo producto</button>
+    </div>
+
+    @for (cat of cats; track cat.id) {
+      <div class="cat-section">
+        <div class="cat-section-header">
+          <span>{{ cat.emoji }}</span>
+          <span class="cat-section-label">{{ cat.label }}</span>
+        </div>
+        @for (p of products; track p.id) {
+          @if (p.cat === cat.id) {
+            <div class="pm-card">
+              <div class="pm-img-wrap">
+                @if (p.image) {
+                  <img [src]="p.image" [alt]="p.name" class="pm-img-cover"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                  <span style="display:none;font-size:24px">{{ p.emoji }}</span>
+                } @else {
+                  <span style="font-size:24px">{{ p.emoji }}</span>
+                }
+              </div>
+              <div class="pm-info">
+                <div class="pm-name">{{ p.name }}</div>
+                <div class="pm-sub">{{ p.cat }} · desde ${{ minPrice(p) }}</div>
+              </div>
+              <div class="pm-actions">
+                <button class="btn btn-outline btn-sm" (click)="openEdit(p)">✏️</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteProduct(p.id)">🗑</button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    }
+
+    @if (editOpen()) {
+      <div class="edit-form">
+        <div class="divider"></div>
+        <h3 class="edit-title">{{ editId() ? 'Editar producto' : 'Nuevo producto' }}</h3>
+        <div class="input-group">
+          <div class="input-label">Nombre</div>
+          <input class="input" [value]="editName()" (input)="editName.set($any($event.target).value)" placeholder="Nombre del producto">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Descripción</div>
+          <textarea class="input" rows="2" [value]="editDesc()" (input)="editDesc.set($any($event.target).value)" placeholder="Ingredientes..."></textarea>
+        </div>
+        <div class="edit-row">
+          <div class="input-group" style="flex:1">
+            <div class="input-label">Categoría</div>
+            <select class="input" [value]="editCat()" (change)="editCat.set($any($event.target).value)">
+              @for (c of cats; track c.id) { <option [value]="c.id">{{ c.emoji }} {{ c.label }}</option> }
+            </select>
+          </div>
+          <div class="input-group" style="width:90px">
+            <div class="input-label">Emoji</div>
+            <input class="input" [value]="editEmoji()" (input)="editEmoji.set($any($event.target).value)" placeholder="🍕">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div class="input-label">Imagen del producto</div>
+          <input id="img-file-input" type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)">
+          @if (!editImage()) {
+            <div class="img-dropzone" [class.drag-active]="dragOver()"
+              (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)"
+              (click)="triggerFileInput()">
+              <div style="font-size:40px;margin-bottom:8px">🖼️</div>
+              <p style="font-size:14px;font-weight:700;margin-bottom:4px">Arrastra una imagen aquí</p>
+              <p style="font-size:12px;color:var(--text3)">o haz clic para seleccionar</p>
+              <p style="font-size:11px;color:var(--text3);margin-top:4px">PNG, JPG, WEBP · Máx 5MB</p>
+            </div>
+          } @else {
+            <div class="img-preview-wrap">
+              <img [src]="editImage()" alt="preview" class="img-preview">
+              <div class="img-preview-actions">
+                <button class="btn btn-outline btn-sm" (click)="triggerFileInput()">🔄 Cambiar</button>
+                <button class="btn btn-danger btn-sm" (click)="clearImage()">✕ Quitar</button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <p class="input-label" style="margin-bottom:8px">Tamaños y Precios</p>
+        @for (s of editSizes(); track $index; let i = $index) {
+          <div class="size-row">
+            <input class="input" placeholder="Tamaño" [value]="s.label" (input)="setSizeLabel(i, $any($event.target).value)">
+            <input class="input" type="number" placeholder="Precio" [value]="s.price" (input)="setSizePrice(i, +$any($event.target).value)" style="width:90px">
+            <button class="btn btn-danger btn-sm" (click)="removeSize(i)">✕</button>
+          </div>
+        }
+        <button class="btn btn-ghost btn-sm" (click)="addSizeRow()" style="margin-bottom:14px;border:1px dashed var(--bg5)">+ Agregar tamaño</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="flex:1" (click)="saveProduct()">💾 GUARDAR</button>
+          <button class="btn btn-outline" (click)="closeEdit()">Cancelar</button>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- USUARIOS -->
+  @if (activeTab() === 'usuarios') {
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.85rem">
+      <button class="btn btn-primary btn-sm" (click)="openNewAdmin()">+ Nuevo admin</button>
+    </div>
+
+    <!-- Formulario crear admin -->
+    @if (newAdminOpen()) {
+      <div class="edit-form" style="margin-bottom:1rem">
+        <h3 class="edit-title">Nuevo administrador</h3>
+        @if (newAdminError()) {
+          <div style="background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);color:var(--red);padding:10px 12px;border-radius:9px;font-size:12px;margin-bottom:12px;font-weight:600">
+            {{ newAdminError() }}
+          </div>
+        }
+        <div class="input-group">
+          <div class="input-label">Nombre completo</div>
+          <input class="input" [value]="newAdminName()" (input)="newAdminName.set($any($event.target).value)" placeholder="Nombre del administrador">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Correo</div>
+          <input class="input" type="email" [value]="newAdminEmail()" (input)="newAdminEmail.set($any($event.target).value)" placeholder="admin@correo.com">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Teléfono</div>
+          <input class="input" [value]="newAdminPhone()" (input)="newAdminPhone.set($any($event.target).value)" placeholder="618-000-0000">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Contraseña</div>
+          <input class="input" type="password" [value]="newAdminPass()" (input)="newAdminPass.set($any($event.target).value)" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="flex:1" (click)="saveNewAdmin()">✓ CREAR ADMIN</button>
+          <button class="btn btn-outline" (click)="closeNewAdmin()">Cancelar</button>
+        </div>
+      </div>
+    }
+
+    <div class="data-list">
+      @for (u of users; track u.id) {
+        <div class="dl-item">
+          <div class="dl-row">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="user-avatar">{{ u.name?.[0]?.toUpperCase() }}</div>
+              <span class="dl-name">{{ u.name }}</span>
+            </div>
+            <span [class]="'badge ' + (u.role === 'admin' ? 'badge-orange' : 'badge-blue')">{{ u.role.toUpperCase() }}</span>
+          </div>
+          <div class="dl-products">{{ u.email }} · {{ u.phone || '—' }}</div>
+          <div style="font-size:12px;color:var(--text2)">Pedidos: <strong>{{ u.orders || 0 }}</strong></div>
+        </div>
+      }
+      @empty {
+        <div style="text-align:center;padding:2.5rem;color:var(--text2)">
+          <div style="font-size:48px;margin-bottom:.75rem">👥</div>
+          <p>Sin usuarios todavía</p>
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -1,0 +1,164 @@
+<div class="cart-screen">
+  <h2 class="section-title">🛒 Tu Carrito</h2>
+
+  @if (!items().length) {
+    <div class="cart-empty">
+      <div class="ce-icon">🛒</div>
+      <h3>Tu carrito está vacío</h3>
+      <p>Agrega algo delicioso desde el menú</p>
+      <button class="btn btn-primary" style="margin-top:1.25rem" (click)="router.navigate(['/menu'])">🍕 VER MENÚ</button>
+    </div>
+  } @else {
+
+    <!-- Items -->
+    <div class="cart-items">
+      @for (item of items(); track item.key; let i = $index) {
+        <div class="cart-item">
+          <div class="ci-img">
+            <img [src]="item.image" [alt]="item.productName" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="ci-emoji-fallback" style="display:none">{{ item.emoji }}</span>
+          </div>
+          <div class="ci-info">
+            <div class="ci-name">{{ item.productName }}</div>
+            <div class="ci-size">{{ item.size.label }} · ${{ item.size.price }} c/u</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn" (click)="changeQty(i,-1)">−</button>
+            <span class="qty-num">{{ item.qty }}</span>
+            <button class="qty-btn" (click)="changeQty(i,1)">+</button>
+          </div>
+          <span class="ci-price">${{ item.size.price * item.qty }}</span>
+          <button class="ci-remove" (click)="remove(i)" title="Eliminar">✕</button>
+        </div>
+      }
+    </div>
+
+    <!-- Order form -->
+    <div class="order-form">
+
+      <!-- Tipo de entrega -->
+      <p class="section-label">Tipo de entrega</p>
+      <div class="delivery-toggle">
+        <div class="delivery-opt" [class.selected]="deliveryType()==='domicilio'" (click)="setDelivery('domicilio')">
+          <span class="do-icon">🛵</span>
+          <div><div class="do-title">A domicilio</div><div class="do-sub">25-35 min</div></div>
+        </div>
+        <div class="delivery-opt" [class.selected]="deliveryType()==='recoger'" (click)="setDelivery('recoger')">
+          <span class="do-icon">🏪</span>
+          <div><div class="do-title">Recoger</div><div class="do-sub">~15 min</div></div>
+        </div>
+      </div>
+
+      @if (deliveryType() === 'domicilio') {
+        <div class="input-group">
+          <label class="input-label">Calle y número *</label>
+          <input class="input" placeholder="Ej: Av. Insurgentes 456" [value]="address()" (input)="address.set($any($event.target).value)">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Colonia</label>
+          <input class="input" placeholder="Ej: Centro, Roma Norte..." [value]="colonia()" (input)="colonia.set($any($event.target).value)">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Referencia</label>
+          <input class="input" placeholder="Entre calles, color de casa..." [value]="referencia()" (input)="referencia.set($any($event.target).value)">
+        </div>
+      } @else {
+        <div class="pickup-info">
+          <div class="pickup-row"><span>📍</span><span>Av. 20 de Noviembre 123, Centro, Durango</span></div>
+          <div class="pickup-row"><span>⏱️</span><span style="color:var(--green);font-weight:700">Listo en aproximadamente 15 minutos</span></div>
+          <div class="pickup-row"><span>🕐</span><span>Horario: Lun–Dom 12:00–23:00</span></div>
+        </div>
+      }
+
+      <div class="input-group">
+        <label class="input-label">Instrucciones especiales</label>
+        <textarea class="input" rows="2" placeholder="Sin cebollas, extra salsa picante..." [value]="notes()" (input)="notes.set($any($event.target).value)"></textarea>
+      </div>
+
+      <!-- Resumen de precio -->
+      <div class="price-summary">
+        <div class="ps-row"><span>Subtotal</span><span>${{ subtotal() }}</span></div>
+        <div class="ps-row">
+          <span>Envío</span>
+          <span [style.color]="envio===0 ? 'var(--green)' : ''">{{ envio===0 ? 'Gratis ✓' : '$'+envio }}</span>
+        </div>
+        @if (envio > 0) {
+          <div class="ps-free-hint">Envío gratis en pedidos mayores a $300</div>
+        }
+        <div class="divider"></div>
+        <div class="ps-total">
+          <span>Total</span>
+          <span class="ps-total-val">${{ total }}</span>
+        </div>
+      </div>
+
+      <!-- Forma de pago -->
+      <p class="section-label" style="margin-top:1.25rem">Forma de pago</p>
+      <div class="payment-grid">
+
+        <!-- Efectivo -->
+        <div class="payment-opt" [class.selected]="paymentMethod()==='efectivo'" (click)="setPayment('efectivo')">
+          <span class="po-icon">💵</span>
+          <span class="po-label">Efectivo</span>
+          @if (paymentMethod()==='efectivo') { <span class="po-check">✓</span> }
+        </div>
+
+        <!-- PayPal -->
+        <div class="payment-opt" [class.selected]="paymentMethod()==='paypal'" (click)="setPayment('paypal')">
+          <img src="assets/images/ui/paypal-logo.png" alt="PayPal" class="po-logo"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+          <span style="display:none;font-weight:800;color:#003087;font-size:13px">PayPal</span>
+          <span class="po-label">PayPal</span>
+          @if (paymentMethod()==='paypal') { <span class="po-check">✓</span> }
+        </div>
+
+        <!-- Uber Eats — abre link externo -->
+        <div class="payment-opt platform-opt" (click)="openUberEats()">
+          <span class="po-icon">🚗</span>
+          <span class="po-label">Uber Eats</span>
+          <span class="po-ext">↗</span>
+        </div>
+
+        <!-- Rappi — abre link externo -->
+        <div class="payment-opt platform-opt" (click)="openRappi()">
+          <span class="po-icon">🛵</span>
+          <span class="po-label">Rappi</span>
+          <span class="po-ext">↗</span>
+        </div>
+
+      </div>
+
+      <!-- PayPal button container -->
+      @if (paymentMethod() === 'paypal') {
+        <div class="paypal-container">
+          @if (processingPaypal()) {
+            <div class="paypal-processing">
+              <div class="processing-spinner"></div>
+              <span>Procesando pago...</span>
+            </div>
+          }
+          <div id="paypal-button-container"></div>
+          <p class="paypal-hint">Serás redirigido a PayPal para completar el pago de forma segura</p>
+        </div>
+      }
+
+      <!-- Plataformas info -->
+      @if (paymentMethod() === 'efectivo') {
+        <div class="platform-notice">
+          <p>🛵 ¿Prefieres pedir por <strong>Uber Eats</strong> o <strong>Rappi</strong>? Haz clic en los botones de arriba para ir directamente a la plataforma.</p>
+        </div>
+      }
+
+      <!-- Confirmar (solo efectivo) -->
+      @if (paymentMethod() === 'efectivo') {
+        <button class="btn btn-primary btn-full" style="margin-top:1rem" (click)="confirmOrder()">
+          CONFIRMAR PEDIDO →
+        </button>
+      }
+
+      <button class="btn btn-outline btn-full" style="margin-top:8px" (click)="router.navigate(['/menu'])">
+        ← Seguir pidiendo
+      </button>
+    </div>
+  }
+</div>

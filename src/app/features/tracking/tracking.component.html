@@ -1,0 +1,99 @@
+<div class="tracking-screen">
+  <h2 class="section-title">📦 Rastrear Pedido</h2>
+
+  <div class="search-row">
+    <input class="input" placeholder="Ingresa tu número de orden ej: #1001"
+      [value]="trackInput()"
+      (input)="trackInput.set($any($event.target).value)"
+      (keydown.enter)="search()">
+    <button class="btn btn-primary btn-sm" (click)="search()">Buscar</button>
+  </div>
+
+  @if (!displayedOrders().length) {
+    <div class="empty-track animate-fade-up">
+      <div style="font-size:64px;margin-bottom:1rem;opacity:.6">📦</div>
+      <h3>Sin pedidos activos</h3>
+      <p>Ingresa tu número de orden o inicia sesión para ver tus pedidos</p>
+    </div>
+  }
+
+  @for (order of displayedOrders(); track order.id) {
+    <div class="order-card animate-fade-up">
+
+      <div class="oc-header">
+        <span class="oc-num">#{{ order.id }}</span>
+        <span [class]="'badge ' + statusBadge[order.status]">{{ statusLabels[order.status] }}</span>
+      </div>
+      <p class="oc-date">{{ orderDate(order) }}</p>
+
+      <!-- Map box -->
+      <div class="map-box">
+        <div class="map-grid"></div>
+        <div class="map-pin" style="top:38%;left:42%;font-size:26px">🍕</div>
+        @if (order.status === 'en-camino') {
+          <div class="map-pin delivery-pin" style="top:60%;left:60%;font-size:24px">🛵</div>
+        }
+        @if (order.status === 'entregado') {
+          <div class="map-pin" style="top:60%;left:60%;font-size:24px">📍</div>
+        }
+        @if (order.status === 'preparando') {
+          <div class="preparing-overlay">
+            <span style="font-size:30px">👨‍🍳</span>
+            <span class="prep-text">Preparando tu pizza...</span>
+          </div>
+        }
+      </div>
+
+      <!-- Repartidor -->
+      @if (order.status === 'en-camino') {
+        <div class="driver-row animate-fade-up">
+          <div class="driver-avatar">🛵</div>
+          <div class="driver-info">
+            <div class="driver-name">Carlos Martínez</div>
+            <div class="driver-sub">Repartidor en camino · 618-555-0099</div>
+          </div>
+          <a href="tel:6185550099" class="btn btn-outline btn-sm">📞</a>
+        </div>
+      }
+
+      <div class="divider"></div>
+
+      <!-- Timeline -->
+      <div class="timeline">
+        @for (step of steps; track step.key) {
+          <div class="tl-item">
+            <div class="tl-left">
+              <div [class]="'tl-dot ' + stepState(order, step.key)">
+                @if (stepState(order, step.key) === 'done') { ✓ }
+                @if (stepState(order, step.key) === 'current') { <div class="tl-pulse"></div> }
+              </div>
+              <div class="tl-line" [class.filled]="stepState(order, step.key) === 'done'"></div>
+            </div>
+            <div class="tl-content">
+              <div class="tl-title">
+                {{ step.icon }} {{ step.label }}
+                @if (stepState(order, step.key) === 'current') {
+                  <span class="tl-live">EN VIVO</span>
+                }
+              </div>
+              <div class="tl-desc">
+                @if (stepState(order, step.key) !== 'pending') {
+                  {{ stepTime(order, step.key) }} — {{ step.desc }}
+                } @else {
+                  {{ step.desc }}
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="divider"></div>
+      <div class="oc-footer">
+        <div class="oc-addr">📍 {{ order.address }}</div>
+        <div class="oc-items">{{ itemsSummary(order) }}</div>
+        <div class="oc-total">Total: ${{ order.total }}</div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,95 @@
+<!-- HERO -->
+<div class="home-hero">
+  <div class="hero-banner">
+    <img src="/assets/images/ui/hero-bg.png" alt="hero" class="hero-bg-img">
+    <div class="hero-overlay">
+      <div class="hero-eyebrow">🍕 Pizzería Maestra · Durango · Desde 1998</div>
+      <h1 class="hero-title">La mejor<br>pizza a tu <span>puerta</span></h1>
+      <p class="hero-sub">Masa artesanal, ingredientes frescos y mucho sabor durangueño. Entrega en 30 minutos o es gratis.</p>
+      <div class="hero-pills">
+        <span class="hero-pill">✅ Envío gratis +$300</span>
+        <span class="hero-pill">⏱️ ~30 min</span>
+        <span class="hero-pill">🌶️ Recetas originales</span>
+        <span class="hero-pill">🔥 Horno de leña</span>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-primary" (click)="router.navigate(['/menu'])">VER MENÚ →</button>
+        <button class="btn btn-ghost-white" (click)="router.navigate(['/tracking'])">Rastrear pedido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORÍAS -->
+<div class="home-section">
+  <span class="section-label">Categorías</span>
+  <div class="cats-scroll hide-scroll">
+    @for (cat of cats; track cat.id) {
+      <div class="cat-chip" [class.selected]="selectedCat()===cat.id" (click)="goMenuCat(cat.id)">
+        <img [src]="cat.image" [alt]="cat.label" class="cat-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none;font-size:26px">{{ cat.emoji }}</span>
+        <p>{{ cat.label }}</p>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- PROMO BANNER -->
+<div class="home-section" style="padding-top:0">
+  <div class="promo-card" (click)="goMenuCat('promociones')">
+    <div class="promo-text">
+      <div class="promo-tag">OFERTA DEL DÍA</div>
+      <h3>2×1 en Medianas</h3>
+      <p>Solo martes · Hasta las 8pm · Excepto especiales</p>
+    </div>
+    <div class="promo-badge">2×1</div>
+  </div>
+</div>
+
+<!-- DESTACADAS -->
+<div class="home-section" style="padding-top:.25rem">
+  <div class="section-header">
+    <span class="section-label" style="margin:0">⭐ Pizzas Destacadas</span>
+    <span class="ver-todo" (click)="router.navigate(['/menu'])">VER TODO →</span>
+  </div>
+  <div class="hscroll hide-scroll">
+    @for (p of featured; track p.id) {
+      <div class="prod-card-h" (click)="openProduct(p)">
+        <div class="prod-img" style="height:130px">
+          <img [src]="p.image" [alt]="p.name" class="prod-photo">
+          <div class="prod-badge">Popular</div>
+        </div>
+        <div class="prod-info">
+          <div class="prod-name">{{ p.name }}</div>
+          <div class="prod-desc">{{ p.desc }}</div>
+          <div class="prod-footer">
+            <span class="price">desde ${{ minPrice(p) }}</span>
+            <button class="add-btn" (click)="quickAdd(p, $event)">+</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- MÁS PEDIDAS -->
+<div class="home-section" style="padding-top:.25rem;padding-bottom:2rem">
+  <span class="section-label">🔥 Más pedidas</span>
+  <div class="products-grid">
+    @for (p of popular; track p.id) {
+      <div class="prod-card-v" (click)="openProduct(p)">
+        <div class="prod-img" style="height:115px">
+          <img [src]="p.image" [alt]="p.name" class="prod-photo">
+        </div>
+        <div class="prod-info">
+          <div class="prod-name">{{ p.name }}</div>
+          <div class="prod-desc">{{ p.desc }}</div>
+          <div class="prod-footer">
+            <span class="price">${{ minPrice(p) }}</span>
+            <button class="add-btn" (click)="quickAdd(p, $event)">+</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

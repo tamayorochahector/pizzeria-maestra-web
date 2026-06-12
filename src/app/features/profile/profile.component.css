@@ -1,0 +1,53 @@
+.profile-screen { padding:1rem; max-width:640px; margin:0 auto; }
+.logged-out { text-align:center; padding:3.5rem 1rem; }
+.lo-icon { font-size:64px; opacity:.6; margin-bottom:1rem; }
+.logged-out p { font-size:13px; color:var(--text2); margin-top:.4rem; }
+
+.profile-hero {
+  background:linear-gradient(135deg,#180c06,#2a1208 60%,#1a0d06);
+  border-radius:18px; padding:1.5rem; margin-bottom:1rem;
+  display:flex; align-items:center; gap:16px;
+  border:1px solid rgba(232,76,30,.1);
+}
+.profile-avatar {
+  width:62px; height:62px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--orange),var(--orange-dark));
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; font-weight:800;
+  border:2px solid rgba(232,76,30,.35);
+  box-shadow:0 4px 20px rgba(232,76,30,.3);
+}
+.profile-name  { font-family:var(--font-cond); font-size:1.6rem; font-weight:800; margin-bottom:4px; }
+.profile-email { font-size:12px; color:var(--text2); margin-top:4px; }
+
+.order-summary {
+  background:var(--bg2); border-radius:14px; padding:1rem;
+  display:flex; align-items:center; justify-content:space-around;
+  margin-bottom:1rem; border:1px solid rgba(255,255,255,.05);
+}
+.os-stat { text-align:center; }
+.os-val  { font-family:var(--font-cond); font-size:1.8rem; font-weight:800; color:var(--orange); }
+.os-label { font-size:11px; color:var(--text2); font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+.os-divider { width:1px; height:40px; background:var(--bg5); }
+
+.menu-list {
+  background:var(--bg2); border-radius:16px;
+  border:1px solid rgba(255,255,255,.05); overflow:hidden; margin-bottom:1rem;
+}
+.mli {
+  display:flex; align-items:center; gap:13px; padding:1rem 1rem;
+  border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; transition:var(--transition);
+}
+.mli:last-child { border-bottom:none; }
+.mli:hover { background:var(--bg3); }
+.mli-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.mli-content { flex:1; min-width:0; }
+.mli-label { font-size:14px; font-weight:700; }
+.mli-sub   { font-size:11px; color:var(--text2); margin-top:2px; }
+.mli-badge { background:var(--orange); color:#fff; font-size:11px; font-weight:800; padding:2px 8px; border-radius:20px; flex-shrink:0; }
+.mli-arrow { color:var(--text3); font-size:16px; flex-shrink:0; }
+
+.logout-btn { color:var(--red); border-color:rgba(231,76,60,.25); margin-top:.25rem; }
+.logout-btn:hover { background:rgba(231,76,60,.06); }
+
+@media(min-width:900px) { .profile-screen { padding:2rem; } }

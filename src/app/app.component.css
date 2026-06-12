@@ -1,0 +1,24 @@
+#app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+.app-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+#screens {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+/* View transitions suaves */
+:root { view-transition-name: none; }
+::view-transition-old(root) { animation: fadeOut .15s ease; }
+::view-transition-new(root) { animation: fadeIn  .2s  ease; }
+@keyframes fadeOut { to { opacity: 0; } }

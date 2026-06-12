@@ -1,0 +1,40 @@
+<div class="login-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="icon">🍕</span>
+      <h2>Bienvenido</h2>
+      <p>Inicia sesión o crea tu cuenta</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab-btn" [class.active]="tab()==='login'" (click)="switchTab('login')">Iniciar sesión</button>
+      <button class="auth-tab-btn" [class.active]="tab()==='register'" (click)="switchTab('register')">Crear cuenta</button>
+    </div>
+    @if (error()) {
+      <div class="error-msg">{{ error() }}</div>
+    }
+
+    @if (tab() === 'login') {
+      <div class="input-group"><div class="input-label">Correo</div>
+        <input class="input" type="email" placeholder="tu@correo.com" [value]="email()" (input)="email.set($any($event.target).value)">
+      </div>
+      <div class="input-group"><div class="input-label">Contraseña</div>
+        <input class="input" type="password" placeholder="••••••" [value]="pass()" (input)="pass.set($any($event.target).value)" (keydown.enter)="doLogin()">
+      </div>
+      <button class="btn btn-primary btn-full" (click)="doLogin()">ENTRAR →</button>
+    } @else {
+      <div class="input-group"><div class="input-label">Nombre completo</div>
+        <input class="input" placeholder="Tu nombre" [value]="name()" (input)="name.set($any($event.target).value)">
+      </div>
+      <div class="input-group"><div class="input-label">Correo</div>
+        <input class="input" type="email" placeholder="tu@correo.com" [value]="regEmail()" (input)="regEmail.set($any($event.target).value)">
+      </div>
+      <div class="input-group"><div class="input-label">Teléfono</div>
+        <input class="input" placeholder="618-000-0000" [value]="phone()" (input)="phone.set($any($event.target).value)">
+      </div>
+      <div class="input-group"><div class="input-label">Contraseña</div>
+        <input class="input" type="password" placeholder="Mínimo 6 caracteres" [value]="regPass()" (input)="regPass.set($any($event.target).value)" (keydown.enter)="doRegister()">
+      </div>
+      <button class="btn btn-primary btn-full" (click)="doRegister()">CREAR CUENTA →</button>
+    }
+  </div>
+</div>

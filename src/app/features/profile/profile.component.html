@@ -1,0 +1,100 @@
+<div class="profile-screen">
+  @if (!isLoggedIn()) {
+    <div class="logged-out animate-fade-up">
+      <div class="lo-icon">👤</div>
+      <h2 class="section-title">Inicia sesión</h2>
+      <p>Accede a tus pedidos, historial y mucho más</p>
+      <button class="btn btn-primary btn-full" style="margin-top:1.5rem" (click)="router.navigate(['/login'])">
+        INICIAR SESIÓN
+      </button>
+      <button class="btn btn-outline btn-full" style="margin-top:8px" (click)="router.navigate(['/login'])">
+        CREAR CUENTA
+      </button>
+    </div>
+  } @else {
+
+    <!-- Hero -->
+    <div class="profile-hero animate-fade-up">
+      <div class="profile-avatar">{{ userInitial }}</div>
+      <div class="profile-info">
+        <div class="profile-name">{{ session()?.name }}</div>
+        <div class="profile-role">
+          <span class="badge" [class]="isAdmin() ? 'badge-orange' : 'badge-blue'">
+            {{ isAdmin() ? '👑 Administrador' : '👤 Cliente' }}
+          </span>
+        </div>
+        <div class="profile-email">{{ session()?.email }}</div>
+      </div>
+    </div>
+
+    <!-- Resumen pedidos -->
+    @if (myOrdersCount > 0) {
+      <div class="order-summary animate-fade-up">
+        <div class="os-stat">
+          <div class="os-val">{{ myOrdersCount }}</div>
+          <div class="os-label">Pedidos</div>
+        </div>
+        <div class="os-divider"></div>
+        <div class="os-stat">
+          <div class="os-val">⭐</div>
+          <div class="os-label">Cliente frecuente</div>
+        </div>
+        @if (lastOrder) {
+          <div class="os-divider"></div>
+          <div class="os-stat">
+            <div class="os-val">${{ lastOrder.total }}</div>
+            <div class="os-label">Último pedido</div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Menu -->
+    <div class="menu-list animate-fade-up">
+      <div class="mli" (click)="router.navigate(['/tracking'])">
+        <div class="mli-icon" style="background:rgba(52,152,219,.1)">📦</div>
+        <div class="mli-content">
+          <div class="mli-label">Mis pedidos</div>
+          <div class="mli-sub">Historial y rastreo en tiempo real</div>
+        </div>
+        @if (myOrdersCount > 0) { <span class="mli-badge">{{ myOrdersCount }}</span> }
+        <span class="mli-arrow">›</span>
+      </div>
+      <div class="mli" (click)="router.navigate(['/menu'])">
+        <div class="mli-icon" style="background:rgba(232,76,30,.1)">🍕</div>
+        <div class="mli-content">
+          <div class="mli-label">Ver menú</div>
+          <div class="mli-sub">Todas nuestras pizzas y más</div>
+        </div>
+        <span class="mli-arrow">›</span>
+      </div>
+      <div class="mli" (click)="router.navigate(['/cart'])">
+        <div class="mli-icon" style="background:rgba(39,174,96,.1)">🛒</div>
+        <div class="mli-content">
+          <div class="mli-label">Mi carrito</div>
+          <div class="mli-sub">{{ cartCount > 0 ? cartCount + ' producto(s)' : 'Vacío' }}</div>
+        </div>
+        @if (cartCount > 0) { <span class="mli-badge">{{ cartCount }}</span> }
+        <span class="mli-arrow">›</span>
+      </div>
+    </div>
+
+    @if (isAdmin()) {
+      <p class="section-label">Administración</p>
+      <div class="menu-list animate-fade-up" style="margin-bottom:1rem">
+        <div class="mli" (click)="router.navigate(['/admin'])">
+          <div class="mli-icon" style="background:rgba(232,76,30,.1)">⚙️</div>
+          <div class="mli-content">
+            <div class="mli-label">Panel de Administración</div>
+            <div class="mli-sub">Pedidos, menú, usuarios y estadísticas</div>
+          </div>
+          <span class="mli-arrow">›</span>
+        </div>
+      </div>
+    }
+
+    <button class="btn btn-outline btn-full logout-btn" (click)="logout()">
+      🚪 Cerrar sesión
+    </button>
+  }
+</div>

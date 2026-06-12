@@ -1,0 +1,11 @@
+<nav id="tab-bar">
+  @for (tab of tabs; track tab.path) {
+    <a class="tab-item" [routerLink]="tab.path" routerLinkActive="active">
+      <span class="tab-icon">{{ tab.icon }}</span>
+      <span class="tab-label">{{ tab.label }}</span>
+      @if (tab.path==='/cart' && cartCount()>0) {
+        <span class="tab-badge">{{ cartCount() }}</span>
+      }
+    </a>
+  }
+</nav>

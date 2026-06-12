@@ -1,0 +1,19 @@
+<header id="app-header">
+  <div class="logo" (click)="router.navigate(['/home'])">
+    <img src="assets/images/ui/logo.png" alt="Pizzería Maestra" class="logo-img"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="logo-fallback" style="display:none">
+      <div class="logo-icon">🍕</div>
+      <div><div class="logo-text">PIZZERÍA</div><div class="logo-sub">Maestra</div></div>
+    </div>
+  </div>
+  <div class="header-spacer"></div>
+  @if (!session()) {
+    <button class="header-login" (click)="router.navigate(['/login'])">Entrar</button>
+  } @else {
+    <div class="header-avatar" (click)="router.navigate(['/profile'])">{{ userInitial }}</div>
+  }
+  <button class="header-cart" (click)="router.navigate(['/cart'])">
+    🛒 <span class="cart-bubble" [class.has-items]="cartCount()>0">{{ cartCount() }}</span>
+  </button>
+</header>

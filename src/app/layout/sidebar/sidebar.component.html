@@ -1,0 +1,47 @@
+<aside id="app-sidebar">
+  <div class="logo" (click)="router.navigate(['/home'])">
+    <img src="assets/images/ui/logo.png" alt="Pizzería Maestra" class="logo-img"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="logo-fallback" style="display:none">
+      <div class="logo-icon">🍕</div>
+      <div><div class="logo-text">PIZZERÍA</div><div class="logo-sub">Maestra · Durango</div></div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of navItems; track item.path) {
+      <a class="sidebar-item" [routerLink]="item.path" routerLinkActive="active">
+        <span class="si-icon">{{ item.icon }}</span>
+        <span class="si-label">{{ item.label }}</span>
+        @if (item.path==='/cart' && cartCount()>0) {
+          <span class="si-badge">{{ cartCount() }}</span>
+        }
+      </a>
+    }
+    @if (isAdmin()) {
+      <a class="sidebar-item admin-item" [routerLink]="'/admin'" routerLinkActive="active">
+        <span class="si-icon">⚙️</span>
+        <span class="si-label">Admin</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-bottom">
+    <button class="sidebar-cart-btn" (click)="router.navigate(['/cart'])">
+      🛒 Ver carrito
+      <span class="cart-count">{{ cartCount() }}</span>
+    </button>
+    @if (!session()) {
+      <button class="btn-outline-side" (click)="router.navigate(['/login'])">Iniciar sesión</button>
+    } @else {
+      <div class="side-user" (click)="router.navigate(['/profile'])">
+        <div class="su-avatar">{{ userInitial }}</div>
+        <div class="su-info">
+          <div class="su-name">{{ session()?.name }}</div>
+          <div class="su-role">{{ session()?.role==='admin' ? 'Administrador' : 'Cliente' }}</div>
+        </div>
+        <span style="color:var(--text3)">›</span>
+      </div>
+    }
+  </div>
+</aside>

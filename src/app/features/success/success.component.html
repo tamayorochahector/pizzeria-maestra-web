@@ -1,0 +1,54 @@
+<div class="success-screen">
+  <div class="success-card animate-fade-up">
+    <div class="success-icon">✅</div>
+    <h2 class="success-title">¡Pedido Confirmado!</h2>
+    <p class="success-sub">Tu pizza está siendo preparada con amor 🍕</p>
+
+    @if (order()) {
+      <div class="order-num">#{{ order()!.id }}</div>
+
+      <div class="success-details">
+        <div class="sd-row">
+          <span>📍 Entrega</span>
+          <span>{{ order()!.deliveryType === 'domicilio' ? 'A domicilio' : 'Recoger en tienda' }}</span>
+        </div>
+        <div class="sd-row">
+          <span>💳 Pago</span>
+          <span>{{ paymentLabel }}</span>
+        </div>
+        <div class="sd-row">
+          <span>💰 Total</span>
+          <span style="color:var(--orange);font-weight:800;font-family:var(--font-cond);font-size:18px">${{ order()!.total }}</span>
+        </div>
+      </div>
+
+      <div class="eta-box">
+        <div class="eta-icon">⏱️</div>
+        <div>
+          <div class="eta-title">Tiempo estimado</div>
+          <div class="eta-val">
+            {{ order()!.deliveryType === 'domicilio' ? '25–35 minutos' : '~15 minutos' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="success-items">
+        @for (item of order()!.items; track item.key) {
+          <div class="si-row">
+            <span>{{ item.emoji }} {{ item.productName }}</span>
+            <span>×{{ item.qty }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="success-actions">
+      <button class="btn btn-primary btn-full" (click)="router.navigate(['/tracking'])">
+        📍 RASTREAR MI PEDIDO
+      </button>
+      <button class="btn btn-outline btn-full" style="margin-top:8px" (click)="router.navigate(['/home'])">
+        ← Volver al inicio
+      </button>
+    </div>
+  </div>
+</div>

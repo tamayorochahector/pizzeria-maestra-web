@@ -1,0 +1,82 @@
+<div class="menu-header">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="input" placeholder="Buscar platillo..."
+      [value]="search()" (input)="search.set($any($event.target).value)"
+      style="padding-left:38px">
+  </div>
+  <select class="sort-select input" [value]="sort()" (change)="sort.set($any($event.target).value)">
+    <option value="default">Ordenar</option>
+    <option value="az">A → Z</option>
+    <option value="price-asc">Menor precio</option>
+    <option value="price-desc">Mayor precio</option>
+  </select>
+</div>
+
+<div class="cats-filter hide-scroll">
+  @for (cat of cats; track cat.id) {
+    <div class="cat-pill" [class.selected]="currentCat()===cat.id" (click)="setCat(cat.id)">
+      <img [src]="cat.image" [alt]="cat.label" class="pill-img" onerror="this.style.display='none'">
+      {{ cat.label }}
+    </div>
+  }
+</div>
+
+<div class="menu-grid">
+  @for (p of filtered; track p.id) {
+    <div class="prod-card-v" (click)="openSheet(p)">
+      <div class="prod-img" style="height:125px">
+        <img [src]="p.image" [alt]="p.name" class="prod-photo"
+          onerror="this.style.display='none';this.parentElement.style.fontSize='44px';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center'">
+      </div>
+      <div class="prod-info">
+        <div class="prod-name">{{ p.name }}</div>
+        <div class="prod-desc">{{ p.desc }}</div>
+        <div class="prod-footer">
+          <div>
+            <span class="price">${{ minPrice(p) }}</span>
+            <span class="price-from"> desde</span>
+          </div>
+          <button class="add-btn" (click)="quickAdd(p, $event)">+</button>
+        </div>
+      </div>
+    </div>
+  }
+  @empty {
+    <div class="empty-menu">
+      <div style="font-size:52px;margin-bottom:.75rem">🔍</div>
+      <p style="font-weight:700;font-size:15px">Sin resultados</p>
+      <p style="font-size:13px;color:var(--text2);margin-top:4px">Intenta con otro término</p>
+    </div>
+  }
+</div>
+
+<!-- Product Sheet -->
+@if (sheetOpen()) {
+  <div class="modal-overlay open" (click)="onOverlay($event)">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-img">
+        <img [src]="sheetProd()?.image" [alt]="sheetProd()?.name" class="sheet-photo"
+          onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-size:80px>' + sheetProd()?.emoji + '</span>'">
+      </div>
+      <h3 class="sheet-name">{{ sheetProd()?.name }}</h3>
+      <p class="sheet-desc">{{ sheetProd()?.desc }}</p>
+      <p class="size-label-hdr">Selecciona tamaño:</p>
+      <div class="size-opts">
+        @for (s of sheetProd()?.sizes ?? []; track s.label; let i = $index) {
+          <div class="size-opt" [class.selected]="sheetSzIdx()===i" (click)="selectSize(i)">
+            <span class="sz-label">{{ s.label }}</span>
+            <span class="sz-price">${{ s.price }}</span>
+          </div>
+        }
+      </div>
+      <div class="sheet-footer">
+        <span class="sheet-price">${{ sheetPrice }}</span>
+        <button class="btn btn-primary" style="padding:13px 28px" (click)="addFromSheet()">
+          + AL CARRITO
+        </button>
+      </div>
+    </div>
+  </div>
+}
